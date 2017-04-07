@@ -4,11 +4,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
 import ua.dzms.useraccounting.entity.User;
+import ua.dzms.useraccounting.service.impl.UserService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -29,12 +28,17 @@ public class ModalController implements Initializable {
     @FXML
     private Button buttonCancel;
 
+
     public ModalController(User user) {
         this.user = user;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        if (user.getId() != 0){
+            label.setText("Edit User");
+            buttonOk.setText("Edit");
+        }
         inputFirstName.setText(user.getFirstName());
         inputLastName.setText(user.getLastName());
         inputDate.setValue(user.getDateOfBirth());
@@ -54,15 +58,39 @@ public class ModalController implements Initializable {
     }
 
     private void clickOk() {
-        user.setFirstName(inputFirstName.getText());
-        user.setLastName(inputLastName.getText());
-        user.setDateOfBirth(inputDate.getValue());
 
-        (label.getScene().getWindow()).setUserData(user);
-        (label.getScene().getWindow()).hide();
+        if (inputFirstName.getText() != null &&
+                inputLastName.getText() != null &&
+                inputDate.getValue() != null) {
+            user.setFirstName(inputFirstName.getText());
+            user.setLastName(inputLastName.getText());
+            user.setDateOfBirth(inputDate.getValue());
+            service();
+            ((Stage) label.getScene().getWindow()).close();
+
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Some field are null");
+            alert.setTitle("Error");
+            alert.show();
+        }
     }
 
     private void clickCancel() {
-        (label.getScene().getWindow()).hide();
+        ((Stage) label.getScene().getWindow()).close();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Cancel");
+        alert.setHeaderText(null);
+        alert.setContentText("Operation has been canceled");
+        alert.show();
+    }
+
+    private void service(){
+        UserService userService = new UserService();
+        if (user.getId() != 0) {
+            userService.editUser(user);
+        } else {
+            userService.addUser(user);
+        }
     }
 }

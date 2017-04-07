@@ -17,7 +17,8 @@ public class UserService implements Service {
 
     @Override
     public void addUser(User newUser) {
-        dao.addUser(newUser);
+        System.out.println("Add");
+//        dao.addUser(newUser);
     }
 
     @Override
@@ -27,6 +28,6 @@ public class UserService implements Service {
 
     @Override
     public void editUser(User editUser) {
-
+        System.out.println("Edit");
     }
 }

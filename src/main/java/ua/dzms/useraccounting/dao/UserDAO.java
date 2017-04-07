@@ -12,6 +12,7 @@ public abstract class UserDAO implements DAO{
         List<User> users = new ArrayList<>();
         while (resultSet.next()){
             User user = new User();
+            user.setId(resultSet.getInt("id"));
             user.setFirstName(resultSet.getNString("firstName"));
             user.setLastName(resultSet.getString("lastName"));
             user.setDateOfBirth((resultSet.getDate("dateOfBirth")).toLocalDate());

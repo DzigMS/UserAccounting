@@ -7,8 +7,8 @@ import java.sql.*;
 import java.util.List;
 
 public class JdbcUserDao extends UserDAO {
-    private static final String SELECT_ALL_USER = "SELECT u.firstName, u.lastName, u.dateOfBirth FROM user AS u;";
-    private static final String ADD_USER = "INSERT INTO user (firstName, lastName, dateOfBirth) VALUES (? , ?, ?) ";
+    private static final String SELECT_ALL_USER = "SELECT u.id, u.firstName, u.lastName, u.dateOfBirth FROM user AS u;";
+    private static final String ADD_USER = "INSERT INTO user (firstName, lastName, dateOfBirth) VALUES (? , ?, ?); ";
 
     @Override
     public List<User> getAll() {
@@ -31,6 +31,8 @@ public class JdbcUserDao extends UserDAO {
             preparedStatement.setString(1, newUser.getFirstName());
             preparedStatement.setString(2, newUser.getLastName());
             preparedStatement.setDate(3, Date.valueOf(newUser.getDateOfBirth()));
+            preparedStatement.executeUpdate();
+
         } catch (SQLException e) {
             throw new RuntimeException();
         }

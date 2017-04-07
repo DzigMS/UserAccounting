@@ -9,10 +9,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ua.dzms.useraccounting.entity.User;
 import ua.dzms.useraccounting.service.Service;
@@ -50,23 +51,36 @@ public class StarterController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         userTable.setItems(users);
+        showAllUsers();
     }
 
     public void addUser(ActionEvent actionEvent) throws IOException {
         User newUser = new User();
+        modalStage(newUser);
+        showAllUsers();
+    }
 
-        Stage modalStage = new Stage();
-        FXMLLoader loader = new FXMLLoader(System.class.getResource("/modal.fxml"));
-        loader.setController(new ModalController(newUser));
-        Parent root = loader.load();
-        modalStage.setScene(new Scene(root));
-
-        modalStage.setTitle(((Button) actionEvent.getSource()).getText() + "User");
-        modalStage.showAndWait();
-        if (modalStage.getUserData() != null){
-            userService.addUser((User) modalStage.getUserData());
+    public void editUser(ActionEvent actionEvent) throws IOException {
+        if (userTable.getSelectionModel().getSelectedItem() == null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(null);
+            alert.setContentText("Select the Item");
+            alert.show();
+        } else {
+            User editUser = userTable.getSelectionModel().getSelectedItem();
+            modalStage(editUser);
             showAllUsers();
         }
-        modalStage.close();
+    }
+
+    private void modalStage(User user) throws IOException {
+        Stage modalStage = new Stage();
+        FXMLLoader loader = new FXMLLoader(System.class.getResource("/modal.fxml"));
+        loader.setController(new ModalController(user));
+        Parent root = loader.load();
+        modalStage.setScene(new Scene(root));
+        modalStage.initOwner(userTable.getScene().getWindow());
+        modalStage.initModality(Modality.APPLICATION_MODAL);
+        modalStage.showAndWait();
     }
 }
