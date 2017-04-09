@@ -76,7 +76,7 @@ public class ModalController implements Initializable {
 
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Some field are null");
+            alert.setContentText("Some field is empty");
             alert.setTitle("Error");
             alert.show();
         }
