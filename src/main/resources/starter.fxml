@@ -22,10 +22,10 @@
     </Label>
     <HBox alignment="BOTTOM_CENTER" GridPane.columnIndex="0" GridPane.rowIndex="1">
         <children>
-            <TextField fx:id="firstNameField" prefWidth="120" promptText="First Name"/>
-            <TextField fx:id="lastNameField" prefWidth="120" promptText="Last Name"/>
-            <DatePicker fx:id="fromDateField" prefWidth="100" promptText="From"/>
-            <DatePicker fx:id="toDateField" prefWidth="100" promptText="To"/>
+            <TextField fx:id="firstNameField" prefWidth="120" promptText="First Name" onKeyReleased="#contains"/>
+            <TextField fx:id="lastNameField" prefWidth="120" promptText="Last Name" onKeyReleased="#contains"/>
+            <DatePicker fx:id="fromDateField" prefWidth="100" promptText="From" onAction="#contains"/>
+            <DatePicker fx:id="toDateField" prefWidth="100" promptText="To" onAction="#contains"/>
         </children>
     </HBox>
     <TableView fx:id="userTable" editable="true" GridPane.columnIndex="0" GridPane.rowIndex="2">
@@ -66,7 +66,7 @@
                     <Insets left="5.0" right="5.0"/>
                 </HBox.margin>
             </Button>
-            <Button text="Delete">
+            <Button text="Delete" onAction="#delete">
                 <HBox.margin>
                     <Insets left="5.0" right="5.0"/>
                 </HBox.margin>

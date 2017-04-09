@@ -1,11 +1,14 @@
 package ua.dzms.useraccounting.service.impl;
 
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import ua.dzms.useraccounting.dao.DAO;
 import ua.dzms.useraccounting.dao.jdbc.JdbcUserDao;
 import ua.dzms.useraccounting.entity.User;
 import ua.dzms.useraccounting.service.Service;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class UserService implements Service {
     private DAO dao = new JdbcUserDao();
@@ -17,17 +20,16 @@ public class UserService implements Service {
 
     @Override
     public void addUser(User newUser) {
-        System.out.println("Add");
-//        dao.addUser(newUser);
+        dao.addUser(newUser);
     }
 
     @Override
     public void removeUser(User removeUser) {
-
+        dao.removeUser(removeUser);
     }
 
     @Override
     public void editUser(User editUser) {
-        System.out.println("Edit");
+        dao.updateUser(editUser);
     }
 }

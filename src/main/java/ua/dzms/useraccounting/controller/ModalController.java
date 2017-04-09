@@ -66,6 +66,12 @@ public class ModalController implements Initializable {
             user.setLastName(inputLastName.getText());
             user.setDateOfBirth(inputDate.getValue());
             service();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(null);
+            alert.setContentText(buttonOk.getText() + " is done");
+            alert.setTitle("DONE");
+            alert.show();
+
             ((Stage) label.getScene().getWindow()).close();
 
         } else {
