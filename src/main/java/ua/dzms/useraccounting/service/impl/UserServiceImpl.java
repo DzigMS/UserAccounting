@@ -1,17 +1,17 @@
 package ua.dzms.useraccounting.service.impl;
 
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import ua.dzms.useraccounting.dao.DAO;
-import ua.dzms.useraccounting.dao.jdbc.JdbcUserDao;
+import ua.dzms.useraccounting.dao.UserDao;
 import ua.dzms.useraccounting.entity.User;
-import ua.dzms.useraccounting.service.Service;
+import ua.dzms.useraccounting.service.UserService;
 
 import java.util.List;
-import java.util.function.Predicate;
 
-public class UserService implements Service {
-    private DAO dao = new JdbcUserDao();
+public class UserServiceImpl implements UserService {
+    private UserDao dao;
+
+    public UserServiceImpl(UserDao dao) {
+        this.dao = dao;
+    }
 
     @Override
     public List<User> getAll() {

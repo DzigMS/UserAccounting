@@ -4,7 +4,6 @@ package ua.dzms.useraccounting.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -14,21 +13,21 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ua.dzms.useraccounting.entity.User;
-import ua.dzms.useraccounting.service.Service;
-import ua.dzms.useraccounting.service.impl.UserService;
+import ua.dzms.useraccounting.service.UserService;
+import ua.dzms.useraccounting.service.ServiceLocator;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
 public class StarterController implements Initializable {
     private ObservableList<User> users = FXCollections.observableArrayList();
-    private Service userService = new UserService();
+    private UserService userService;
 
     @FXML
     private TableView<User> userTable;
@@ -41,12 +40,16 @@ public class StarterController implements Initializable {
     @FXML
     private DatePicker toDateField;
 
+    public StarterController() {
+        userService = ServiceLocator.getInstance().getService(UserService.class);
+    }
+
     public void exit() {
         ((Stage) userTable.getScene().getWindow()).close();
     }
 
     public void showAllUsers() {
-        clearField();
+        clearFields();
         users.clear();
         users.addAll(userService.getAll());
         userTable.setItems(users);
@@ -57,21 +60,21 @@ public class StarterController implements Initializable {
         showAllUsers();
     }
 
-    public void addUser() throws IOException {
+    public void addUser() {
         User newUser = new User();
-        modalStage(newUser);
+        newModalStage(newUser);
         showAllUsers();
     }
 
-    public void editUser() throws IOException {
+    public void editUser() {
         if (isSelectedItem()) {
             User editUser = userTable.getSelectionModel().getSelectedItem();
-            modalStage(editUser);
+            newModalStage(editUser);
             showAllUsers();
         }
     }
 
-    public void delete() {
+    public void deleteUser() {
         if (isSelectedItem()) {
             User removeUser = userTable.getSelectionModel().getSelectedItem();
             userService.removeUser(removeUser);
@@ -83,7 +86,9 @@ public class StarterController implements Initializable {
         Predicate<User> predicate = new Predicate<User>() {
             @Override
             public boolean test(User user) {
-                return isContains(user);
+                return (isContainsFirstName(user.getFirstName()) &&
+                        isContainsLastName(user.getLastName()) &&
+                        isBetweenDate(user.getDateOfBirth()));
             }
         };
         FilteredList<User> filteredList = new FilteredList<>(users, predicate);
@@ -91,45 +96,43 @@ public class StarterController implements Initializable {
         userTable.setItems(filteredList);
     }
 
-    private void clearField() {
+    private void clearFields() {
         firstNameField.clear();
         lastNameField.clear();
         fromDateField.setValue(null);
         toDateField.setValue(null);
     }
 
-    private void modalStage(User user) throws IOException {
-        Stage modalStage = new Stage();
-        FXMLLoader loader = new FXMLLoader(System.class.getResource("/modal.fxml"));
-        loader.setController(new ModalController(user));
-        Parent root = loader.load();
-        modalStage.setScene(new Scene(root));
-        modalStage.initOwner(userTable.getScene().getWindow());
-        modalStage.initModality(Modality.APPLICATION_MODAL);
-        modalStage.showAndWait();
+    private void newModalStage(User user) {
+        try {
+            Stage modalStage = new Stage();
+            FXMLLoader loader = new FXMLLoader(System.class.getResource("/fxml/modal.fxml"));
+            loader.setController(new ModalController(user));
+            Parent root = loader.load();
+            modalStage.setScene(new Scene(root));
+            modalStage.initOwner(userTable.getScene().getWindow());
+            modalStage.initModality(Modality.APPLICATION_MODAL);
+            modalStage.showAndWait();
+        } catch (IOException e) {
+            throw new RuntimeException("Error load loader in parent root");
+        }
     }
 
-    private boolean isContains(User user) {
-        boolean result;
-        result = (user.getFirstName().toLowerCase()).contains((firstNameField.getText()).toLowerCase());
-        if (result) {
-            result = (user.getLastName().toLowerCase()).contains((lastNameField.getText()).toLowerCase());
-        } else {
-            return false;
+    private boolean isContainsFirstName(String firstName) {
+        return (firstName.toLowerCase()).contains((firstNameField.getText()).toLowerCase());
+    }
+
+    private boolean isContainsLastName(String lastName) {
+        return (lastName.toLowerCase()).contains((lastNameField.getText()).toLowerCase());
+    }
+
+    private boolean isBetweenDate(LocalDate date) {
+        boolean result = true;
+        if (fromDateField.getValue() != null){
+            result = date.isAfter(fromDateField.getValue());
         }
-        if (fromDateField.getValue() != null) {
-            if (result) {
-                result = (user.getDateOfBirth()).isAfter(fromDateField.getValue());
-            } else {
-                return false;
-            }
-        }
-        if (toDateField.getValue() != null) {
-            if (result) {
-                result = (user.getDateOfBirth()).isBefore(toDateField.getValue());
-            } else {
-                return false;
-            }
+        if (toDateField.getValue() != null){
+            result = date.isBefore(toDateField.getValue());
         }
         return result;
     }

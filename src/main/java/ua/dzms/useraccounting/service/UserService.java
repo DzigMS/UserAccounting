@@ -4,7 +4,7 @@ import ua.dzms.useraccounting.entity.User;
 
 import java.util.List;
 
-public interface Service {
+public interface UserService {
     List<User> getAll();
     void addUser(User newUser);
     void removeUser(User removeUser);

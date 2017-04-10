@@ -1,13 +1,12 @@
 package ua.dzms.useraccounting.controller;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import ua.dzms.useraccounting.entity.User;
-import ua.dzms.useraccounting.service.impl.UserService;
+import ua.dzms.useraccounting.service.UserService;
+import ua.dzms.useraccounting.service.ServiceLocator;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -15,6 +14,7 @@ import java.util.ResourceBundle;
 
 public class ModalController implements Initializable {
     private User user;
+    private UserService userService;
     @FXML
     private Label label;
     @FXML
@@ -31,33 +31,24 @@ public class ModalController implements Initializable {
 
     public ModalController(User user) {
         this.user = user;
+        userService = ServiceLocator.getInstance().getService(UserService.class);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if (user.getId() != 0){
+        if (user.getId() == 0){
+            label.setText("Add User");
+            buttonOk.setText("Add");
+        }else {
             label.setText("Edit User");
             buttonOk.setText("Edit");
+            inputFirstName.setText(user.getFirstName());
+            inputLastName.setText(user.getLastName());
+            inputDate.setValue(user.getDateOfBirth());
         }
-        inputFirstName.setText(user.getFirstName());
-        inputLastName.setText(user.getLastName());
-        inputDate.setValue(user.getDateOfBirth());
-
-        buttonOk.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                clickOk();
-            }
-        });
-        buttonCancel.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                clickCancel();
-            }
-        });
     }
 
-    private void clickOk() {
+    public void clickOk() {
 
         if (inputFirstName.getText() != null &&
                 inputLastName.getText() != null &&
@@ -65,7 +56,7 @@ public class ModalController implements Initializable {
             user.setFirstName(inputFirstName.getText());
             user.setLastName(inputLastName.getText());
             user.setDateOfBirth(inputDate.getValue());
-            service();
+            addOrEdit();
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(null);
             alert.setContentText(buttonOk.getText() + " is done");
@@ -82,7 +73,7 @@ public class ModalController implements Initializable {
         }
     }
 
-    private void clickCancel() {
+    public void clickCancel() {
         ((Stage) label.getScene().getWindow()).close();
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Cancel");
@@ -91,8 +82,7 @@ public class ModalController implements Initializable {
         alert.show();
     }
 
-    private void service(){
-        UserService userService = new UserService();
+    private void addOrEdit(){
         if (user.getId() != 0) {
             userService.editUser(user);
         } else {
